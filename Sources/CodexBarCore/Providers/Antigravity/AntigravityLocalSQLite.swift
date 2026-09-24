@@ -9,14 +9,22 @@ extension AntigravityLocalReader {
     static func readDatabases(_ paths: [URL], budget: Budget) throws -> SourceResult {
         var result = SourceResult()
         for url in paths {
-            try budget.check()
-            budget.statistics.files += 1
-            guard budget.statistics.files <= budget.limits.databases else { throw ScanFailure.exhausted }
-            let source = try self.readDatabase(url, budget: budget)
-            result.events.append(contentsOf: source.events)
-            result.isComplete = result.isComplete && source.isComplete
-            result.containsHistorySource = result.containsHistorySource || source.containsHistorySource
-            result.evidenceIsUnstable = result.evidenceIsUnstable || source.evidenceIsUnstable
+            do {
+                try budget.check()
+                budget.statistics.files += 1
+                guard budget.statistics.files <= budget.limits.databases else { throw ScanFailure.exhausted }
+                let source = try self.readDatabase(url, budget: budget)
+                result.events.append(contentsOf: source.events)
+                result.isComplete = result.isComplete && source.isComplete
+                result.containsHistorySource = result.containsHistorySource || source.containsHistorySource
+                result.evidenceIsUnstable = result.evidenceIsUnstable || source.evidenceIsUnstable
+            } catch ScanFailure.exhausted {
+                // Preserve rows already decoded. They are valid partial history and are more useful
+                // than replacing the report with an empty result when a large history tree hits limits.
+                guard !result.events.isEmpty else { throw ScanFailure.exhausted }
+                result.isComplete = false
+                break
+            }
         }
         return result
     }

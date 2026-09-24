@@ -38,7 +38,7 @@ extension AntigravityLocalReader {
         var bytes = 128 * 1024 * 1024
         var schemaEntries = 128
         var schemaColumns = 64
-        var schemaBytes = 64 * 1024
+        var schemaBytes = 256 * 1024
         var duration: TimeInterval = 5
     }
 
