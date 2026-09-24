@@ -38,7 +38,7 @@ extension AntigravityLocalReader {
             guard step == SQLITE_ROW else { return .unsupported }
             entries += 1
             budget.statistics.schemaEntries += 1
-            guard entries <= budget.limits.schemaEntries else { throw ScanFailure.exhausted }
+            guard entries <= budget.limits.schemaEntries else { throw ScanFailure.schemaExhausted }
             guard let name = try self.schemaText(statement, column: 0, budget: budget),
                   let type = try self.schemaText(statement, column: 1, budget: budget)
             else { return .unsupported }
@@ -63,7 +63,7 @@ extension AntigravityLocalReader {
             guard step == SQLITE_ROW else { return false }
             entries += 1
             budget.statistics.schemaEntries += 1
-            guard entries <= budget.limits.schemaEntries else { throw ScanFailure.exhausted }
+            guard entries <= budget.limits.schemaEntries else { throw ScanFailure.schemaExhausted }
             let name = try self.schemaText(statement, column: 0, budget: budget)
             let type = try self.schemaText(statement, column: 1, budget: budget)
             guard name?.lowercased() == "steps" else { continue }
@@ -87,7 +87,7 @@ extension AntigravityLocalReader {
             guard step == SQLITE_ROW else { return false }
             count += 1
             budget.statistics.schemaColumns += 1
-            guard count <= min(budget.limits.schemaColumns, 64) else { throw ScanFailure.exhausted }
+            guard count <= min(budget.limits.schemaColumns, 64) else { throw ScanFailure.schemaExhausted }
             guard sqlite3_column_type(statement, 6) == SQLITE_INTEGER,
                   sqlite3_column_int(statement, 6) == 0 else { return false }
             guard let name = try self.schemaText(statement, column: 1, budget: budget) else { return false }
@@ -112,7 +112,7 @@ extension AntigravityLocalReader {
             guard step == SQLITE_ROW else { return false }
             count += 1
             budget.statistics.schemaColumns += 1
-            guard count <= min(budget.limits.schemaColumns, 64) else { throw ScanFailure.exhausted }
+            guard count <= min(budget.limits.schemaColumns, 64) else { throw ScanFailure.schemaExhausted }
             guard sqlite3_column_type(statement, 6) == SQLITE_INTEGER,
                   sqlite3_column_int(statement, 6) == 0 else { return false }
             guard let name = try self.schemaText(statement, column: 1, budget: budget) else { return false }

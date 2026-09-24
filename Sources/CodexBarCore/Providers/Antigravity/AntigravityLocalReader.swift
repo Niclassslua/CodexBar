@@ -147,6 +147,9 @@ enum AntigravityLocalReader {
         } catch ScanFailure.exhausted {
             return DailyReportResult(
                 report: .init(data: [], summary: nil), coverage: .partial, statistics: budget.statistics)
+        } catch ScanFailure.schemaExhausted {
+            return DailyReportResult(
+                report: .init(data: [], summary: nil), coverage: .partial, statistics: budget.statistics)
         }
     }
 
